@@ -1,0 +1,3 @@
+F:/TestSql/cmake-build-debug/CMakeFiles/TestSql.dir
+F:/TestSql/cmake-build-debug/CMakeFiles/edit_cache.dir
+F:/TestSql/cmake-build-debug/CMakeFiles/rebuild_cache.dir
