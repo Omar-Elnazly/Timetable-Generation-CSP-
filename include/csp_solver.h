@@ -4,33 +4,32 @@
 #include "models.h"
 #include <vector>
 #include <unordered_map>
-#include <optional>
 #include <chrono>
-#include <unordered_set>
 #include <string>
 
-// Represents a variable in the CSP (a session that needs to be scheduled)
+// CSP variable: a session that needs scheduling
 struct LectureVar {
-    string varID;           // unique identifier
-    string courseID;        // e.g., "CSC111"
-    int year;               // 1, 2, or 3
-    int groupId;            // 1-3 for Y1/Y2, 0 for Y3 specializations
-    int sectionId;          // for Japanese: 1-3, for labs: 1-3, else 0
-    string specialization;  // "AID", "BIF", "CSC", "CNC" for Year 3, empty otherwise
-    string sessionType;     // "LECTURE", "LAB"
-    int lengthMin;          // 90 minutes
+    string varID;
+    string courseID;
+    int year;               // 1-4
+    int groupId;            // 1-3 for Y1-2, 0 for Y3-4 specializations
+    int sectionId;          // Japanese: 1-3, Labs: 1-3, else 0
+    string specialization;  // "AID"|"BIF"|"CSC"|"CNC" for Y3-4
+    string sessionType;     // "LECTURE"|"LAB"
+    int lengthMin;          // 90
+    bool isFullDay;         // true for graduation projects (4 consecutive slots)
 };
 
-// Represents a value that can be assigned to a variable
+// CSP value: (timeslot, room, instructor) assignment
 struct AssignmentValue {
-    int timeslotIndex;      // index into timeSlots vector
+    int timeslotIndex;
     string roomID;
     string instructorID;
 };
 
 struct CSPResult {
     bool success;
-    std::unordered_map<std::string, AssignmentValue> assignments; // varID -> value
+    std::unordered_map<std::string, AssignmentValue> assignments;
     int hardViolations;
     int softCost;
     double solveSeconds;
@@ -44,20 +43,12 @@ public:
               const std::vector<Room>& rooms,
               const std::vector<TimeSlot>& timeSlots);
 
-    // build the variable set (one LectureVar per required session)
     void buildLectureVariables();
-
-    // generate domains for each variable (timeslot x room x instructor combinations)
     void buildDomains();
-
-    // run solver (backtracking with MRV + forward checking)
     CSPResult solve(int maxSolutions = 1);
-
-    // helper: pretty print assignment
     void printResult(const CSPResult& r, const std::vector<LectureVar>& vars,
                      const std::vector<TimeSlot>& timeSlots, const std::vector<Room>& rooms);
 
-    // expose variables read-only so callers (main.cpp) can print results
     const std::vector<LectureVar>& getVariables() const { return variables; }
 
 private:
@@ -68,16 +59,12 @@ private:
     const std::vector<TimeSlot>& timeSlots;
 
     std::vector<LectureVar> variables;
-    std::vector<std::vector<AssignmentValue>> domains; // domain per variable
+    std::vector<std::vector<AssignmentValue>> domains;
 
-    // helper indices
     std::unordered_map<std::string, const Course*> courseIndex;
-    std::unordered_map<std::string, std::vector<std::string>> courseToInstructors; // courseID -> list of instructorIDs
+    std::unordered_map<std::string, std::vector<std::string>> courseToInstructors;
 
-    // internal backtracking
     CSPResult backtrackSearch();
-
-    // utilities
     bool isHardConflict(const AssignmentValue& a, const AssignmentValue& b, 
                         const LectureVar& va, const LectureVar& vb) const;
     int computeSoftCost(const std::unordered_map<std::string, AssignmentValue>& assignments) const;

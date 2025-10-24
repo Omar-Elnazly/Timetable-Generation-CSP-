@@ -13,17 +13,16 @@ int main() {
         auto rooms = db.getRooms();
         auto timeSlots = db.getTimeSlots();
 
-        cout << "Timetable Generation is Connecting ... (I hope)\n";
-        cout << "=========================================\n";
-        cout << "Loaded Data:\n" << courses.size() << " courses, " << instructors.size()
+        cout << "Timetable Generation CSP Solver\n=========================================\n";
+        cout << "Loaded: " << courses.size() << " courses, " << instructors.size()
              << " instructors, " << rooms.size() << " rooms, " << timeSlots.size() << " time slots\n\n";
 
         vector<Course> filteredCourses;
         for (const auto& c : courses) {
-            if (c.year == 1 || c.year == 2 || c.year == 3) filteredCourses.push_back(c);
+            if (c.year >= 1 && c.year <= 4) filteredCourses.push_back(c);
         }
         
-        cout << "Scheduling " << filteredCourses.size() << " courses (Years 1-3)\n";
+        cout << "Scheduling " << filteredCourses.size() << " courses (Years 1-4)\n";
 
         CSPSolver solver(filteredCourses, instructors, instructorCourses, rooms, timeSlots);
         solver.buildLectureVariables();
@@ -34,11 +33,9 @@ int main() {
         
         if (result.success) {
             solver.printResult(result, solver.getVariables(), timeSlots, rooms);
-            cout << "\nSUCCESS | Hard violations: "
-                 << result.hardViolations << "\n";
+            cout << "\nSUCCESS | Hard violations: " << result.hardViolations << "\n";
         } else {
-            cout << "\nFAILED: No valid schedule found\n";
-            cout << "Possible causes: insufficient resources, conflicting constraints\n\n";
+            cout << "\nFAILED | No valid schedule found\n";
         }
     }
     catch (const exception& e) {

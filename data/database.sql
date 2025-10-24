@@ -75,31 +75,31 @@ INSERT INTO "Courses" VALUES ('CSE214','Computer Organization',3,'Lecture and La
 INSERT INTO "Courses" VALUES ('LRA306','Natural Resources and Sustainability',2,'Lecture',2,'Common',1,0,0);
 
 -- Year 3 Common Courses
-INSERT INTO "Courses" VALUES ('ECE324','Introduction to Electronics Engineering',3,'Lecture and Lab',3,'Common',1,1,0);
-INSERT INTO "Courses" VALUES ('CSC317','Compiler Design',3,'Lecture and Lab',3,'Common',1,1,0);
+INSERT INTO "Courses" VALUES ('ECE324','Digital Signal Processing',3,'Lecture and Lab',3,'Common',1,1,0);
+INSERT INTO "Courses" VALUES ('CSC317','Computer Graphics and Visualization',3,'Lecture and Lab',3,'Common',1,1,0);
 INSERT INTO "Courses" VALUES ('AID312','Intelligent Systems',3,'Lecture and Lab',3,'Common',1,1,0);
 INSERT INTO "Courses" VALUES ('CNC311','Computer Networks',3,'Lecture and Lab',3,'Common',1,1,0);
 INSERT INTO "Courses" VALUES ('CNC314','Database Systems',3,'Lecture and Lab',3,'Common',1,1,0);
 
 -- Year 3 CNC Specialization
-INSERT INTO "Courses" VALUES ('CNC312','Introduction to Embedded Systems',3,'Lecture and Lab',3,'CNC',1,1,0);
+INSERT INTO "Courses" VALUES ('CNC312','Foundations of Information Systems',3,'Lecture and Lab',3,'CNC',1,1,0);
 
 -- Year 3 AID Specialization
 INSERT INTO "Courses" VALUES ('AID311','Mathematics of Data Science',3,'Lecture and Lab',3,'AID',1,1,0);
 
 -- Year 3 CSC Specialization
-INSERT INTO "Courses" VALUES ('CSC314','Operating Systems',3,'Lecture and Lab',3,'CSC',1,1,0);
+INSERT INTO "Courses" VALUES ('CSC314','Software Modeling and Analysis',3,'Lecture and Lab',3,'CSC',1,1,0);
 
 -- Year 3 BIF Specialization
-INSERT INTO "Courses" VALUES ('BIF311','Bioinformatics Fundamentals',3,'Lecture and Lab',3,'BIF',1,1,0);
+INSERT INTO "Courses" VALUES ('BIF311','Human Biology',3,'Lecture and Lab',3,'BIF',1,1,0);
 
 -- Year 4 CNC Specialization
-INSERT INTO "Courses" VALUES ('CNC413','Network Security',3,'Lecture and Lab',4,'CNC',1,1,0);
-INSERT INTO "Courses" VALUES ('CNC419','Cloud Computing',3,'Lecture and Lab',4,'CNC',1,1,0);
-INSERT INTO "Courses" VALUES ('CNC411','Advanced Networks',3,'Lecture and Lab',4,'CNC',1,1,0);
-INSERT INTO "Courses" VALUES ('CNC418','IoT Systems',3,'Lecture and Lab',4,'CNC',1,1,0);
-INSERT INTO "Courses" VALUES ('CNC324','Network Management',3,'Lecture and Lab',4,'CNC',1,1,0);
-INSERT INTO "Courses" VALUES ('CNC415','Wireless Networks',3,'Lecture and Lab',4,'CNC',1,1,0);
+INSERT INTO "Courses" VALUES ('CNC413','Digital Forensics',3,'Lecture and Lab',4,'CNC',1,1,0);
+INSERT INTO "Courses" VALUES ('CNC419','IT Security and Risk Management',3,'Lecture and Lab',4,'CNC',1,1,0);
+INSERT INTO "Courses" VALUES ('CNC418','Software Security',3,'Lecture and Lab',4,'CNC',1,1,0);
+INSERT INTO "Courses" VALUES ('CNC324','IT Infrastructure',3,'Lecture and Lab',4,'CNC',1,1,0);
+INSERT INTO "Courses" VALUES ('CNC411','Fundamentals of Cybersecurity',3,'Lecture and Lab',4,'CNC',1,1,0);
+INSERT INTO "Courses" VALUES ('CNC415','Network Design and Management',3,'Lecture and Lab',4,'CNC',1,1,0);
 INSERT INTO "Courses" VALUES ('CNC414','Graduation Project (1)',2,'Lab',4,'CNC',0,1,1);
 
 -- Year 4 AID Specialization
@@ -112,21 +112,21 @@ INSERT INTO "Courses" VALUES ('AID413','Data Security',3,'Lecture and Lab',4,'AI
 INSERT INTO "Courses" VALUES ('AID427','New Trends in Data Science',3,'Lecture and Lab',4,'AID',1,1,0);
 
 -- Year 4 CSC Specialization
-INSERT INTO "Courses" VALUES ('CSC414','Software Architecture',3,'Lecture and Lab',4,'CSC',1,1,0);
-INSERT INTO "Courses" VALUES ('CSC415','Advanced Algorithms',3,'Lecture and Lab',4,'CSC',1,1,0);
+INSERT INTO "Courses" VALUES ('CSC414','Game Design & Development',3,'Lecture and Lab',4,'CSC',1,1,0);
+INSERT INTO "Courses" VALUES ('CSC415','New Trends in Computer Science',3,'Lecture and Lab',4,'CSC',1,1,0);
 INSERT INTO "Courses" VALUES ('CSC426','Distributed Systems',3,'Lecture and Lab',4,'CSC',1,1,0);
-INSERT INTO "Courses" VALUES ('CSC410','Software Testing',3,'Lecture and Lab',4,'CSC',1,1,0);
-INSERT INTO "Courses" VALUES ('CSC412','Mobile Development',3,'Lecture and Lab',4,'CSC',1,1,0);
+INSERT INTO "Courses" VALUES ('CSC410','Software Quality',3,'Lecture and Lab',4,'CSC',1,1,0);
+INSERT INTO "Courses" VALUES ('CSC412','Software Security',3,'Lecture and Lab',4,'CSC',1,1,0);
 INSERT INTO "Courses" VALUES ('CSC413','Graduation Project (1)',2,'Lab',4,'CSC',0,1,1);
-INSERT INTO "Courses" VALUES ('CSC411','Web Technologies',3,'Lecture and Lab',4,'CSC',1,1,0);
+INSERT INTO "Courses" VALUES ('CSC411','Software Verification and Validation (V&V)',3,'Lecture and Lab',4,'CSC',1,1,0);
 
 -- Year 4 BIF Specialization
-INSERT INTO "Courses" VALUES ('BIF412','Genomic Data Analysis',3,'Lecture and Lab',4,'BIF',1,1,0);
-INSERT INTO "Courses" VALUES ('BIF411','Computational Biology',3,'Lecture and Lab',4,'BIF',1,1,0);
-INSERT INTO "Courses" VALUES ('BIF413','Protein Structure',3,'Lecture and Lab',4,'BIF',1,1,0);
-INSERT INTO "Courses" VALUES ('BIF425','Systems Biology',3,'Lecture and Lab',4,'BIF',1,1,0);
+INSERT INTO "Courses" VALUES ('BIF412','Management and Design of Health Care Systems',3,'Lecture and Lab',4,'BIF',1,1,0);
+INSERT INTO "Courses" VALUES ('BIF411','Structural Bioinformatics',3,'Lecture and Lab',4,'BIF',1,1,0);
+INSERT INTO "Courses" VALUES ('BIF413','Algorithms in Bioinformatics',3,'Lecture and Lab',4,'BIF',1,1,0);
+INSERT INTO "Courses" VALUES ('BIF425','New Trends in Bioinformatics',3,'Lecture and Lab',4,'BIF',1,1,0);
 INSERT INTO "Courses" VALUES ('BIF410','Graduation Project (1)',2,'Lab',4,'BIF',0,1,1);
-INSERT INTO "Courses" VALUES ('BIF424','Molecular Modeling',3,'Lecture and Lab',4,'BIF',1,1,0);
+INSERT INTO "Courses" VALUES ('BIF424','IT Infrastructure',3,'Lecture and Lab',4,'BIF',1,1,0);
 
 -- ====== INSTRUCTORS DATA ======
 
