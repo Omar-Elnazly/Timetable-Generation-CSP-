@@ -1,208 +1,445 @@
-// src/csp_solver.cpp
-#include <iostream>
-#include <algorithm>
-#include <unordered_map>
 #include "../include/csp_solver.h"
+#include <algorithm>
+#include <iostream>
+#include <unordered_set>
+#include <limits>
+#include <functional>
+#include <numeric>
+#include <sstream>
+#include <iomanip>
 
 using namespace std;
+using clk = std::chrono::high_resolution_clock;
 
-// Constructor: initialize domains using string IDs for courses/instructors/rooms
-CSPSolver::CSPSolver(
-        const vector<Course>& c,
-        const vector<Instructor>& i,
-        const vector<Room>& r,
-        const vector<TimeSlot>& t
-) : courses(c), instructors(i), rooms(r), timeSlots(t)
-{
-    // Build initial domains for each course (all possible instructors, rooms, slots)
-    for (const auto &course : courses) {
-        vector<string> instIDs;
-        vector<string> roomIDs;
-        vector<int> slotIDs;
-
-        for (const auto &inst : instructors) instIDs.push_back(inst.id);
-        for (const auto &room : rooms) roomIDs.push_back(room.id);
-        for (const auto &slot : timeSlots) slotIDs.push_back(slot.id);
-
-        domainInstructors[course.id] = move(instIDs);
-        domainRooms[course.id]       = move(roomIDs);
-        domainSlots[course.id]       = move(slotIDs);
-    }
+static string minTo12Hour(int mins) {
+    int h = mins / 60;
+    int m = mins % 60;
+    bool pm = (h >= 12);
+    int hh = h % 12;
+    if (hh == 0) hh = 12;
+    ostringstream ss;
+    ss << setw(2) << setfill('0') << hh << ":" << setw(2) << setfill('0') << m << (pm ? "PM" : "AM");
+    return ss.str();
 }
 
-// Check hard constraints for a single assignment against current partial solution
-bool CSPSolver::isValidAssignment(const LectureAssignment& a) {
-
-    for (const auto &existing : solution) {
-        if (existing.instructorID == a.instructorID && existing.timeSlotID == a.timeSlotID)
-            return false;
-        if (existing.roomID == a.roomID && existing.timeSlotID == a.timeSlotID)
-            return false;
-    }
-
-
-    // check room type vs course type
-    string courseType = "Lecture";
-    for (const auto &c : courses) {
-        if (c.id == a.courseID) {
-            courseType = c.hasLab ? "Lab" : "Lecture";
-            break;
-        }
-    }
-
-    string roomType;
-    for (const auto &r : rooms) {
-        if (r.id == a.roomID) {
-            roomType = r.roomType;
-            break;
-        }
-    }
-
-    if (roomType.empty()) return false; // unknown room
-    if (roomType != courseType) return false;
-
-    return true;
-}
-
-// MRV: choose the unassigned course with the smallest combined domain size
-string CSPSolver::selectCourseMRV() {
-    string bestCourse = "";
-    size_t bestSize = SIZE_MAX;
-
-    for (const auto &course : courses) {
-        // skip already assigned
-        bool assigned = false;
-        for (const auto &a : solution) {
-            if (a.courseID == course.id) { assigned = true; break; }
-        }
-        if (assigned) continue;
-
-        size_t instCount = domainInstructors[course.id].size();
-        size_t roomCount = domainRooms[course.id].size();
-        size_t slotCount = domainSlots[course.id].size();
-
-        // if any domain is zero, it's an immediate dead end—return that course (most constrained)
-        if (instCount == 0 || roomCount == 0 || slotCount == 0) return course.id;
-
-        // measure = product (could overflow but sizes are small here)
-        size_t measure = instCount * roomCount * slotCount;
-        if (measure < bestSize) {
-            bestSize = measure;
-            bestCourse = course.id;
-        }
-    }
-
-    return bestCourse;
-}
-
-// Backtracking with forward checking and MRV
-bool CSPSolver::backtrack(int depth) {
-    // success if all courses assigned
-    if (solution.size() == courses.size()) return true;
-
-    // select most constrained unassigned course
-    string courseID = selectCourseMRV();
-    if (courseID.empty()) return false;
-
-    // find course metadata pointer
-    const Course* coursePtr = nullptr;
-    for (const auto &c : courses) {
-        if (c.id == courseID) { coursePtr = &c; break; }
-    }
-    if (!coursePtr) return false;
-    const Course &course = *coursePtr;
-
-    // iterate domain values for the selected course
-    auto &instDomain = domainInstructors[courseID];
-    auto &roomDomain = domainRooms[courseID];
-    auto &slotDomain = domainSlots[courseID];
-
-    // iterate copies to allow domain modification during forward checking
-    vector<string> instDomainCopy = instDomain;
-    vector<string> roomDomainCopy = roomDomain;
-    vector<int> slotDomainCopy = slotDomain;
-
-    for (const auto &instID : instDomainCopy) {
-        for (const auto &roomID : roomDomainCopy) {
-            for (const auto slotID : slotDomainCopy) {
-                LectureAssignment a{ courseID, instID, roomID, slotID };
-
-                if (!isValidAssignment(a)) continue;
-
-                // Save domains (shallow copy of maps) to restore on backtrack
-                auto oldDomainInstructors = domainInstructors;
-                auto oldDomainRooms = domainRooms;
-                auto oldDomainSlots = domainSlots;
-
-                // Forward checking: prune conflicting values from other courses
-                bool ok = true;
-                for (const auto &other : courses) {
-                    if (other.id == courseID) continue;
-
-                    // remove same instructor at same timeslot
-                    auto &odInst = domainInstructors[other.id];
-                    odInst.erase(remove(odInst.begin(), odInst.end(), a.instructorID), odInst.end());
-
-                    // remove same room at same timeslot
-                    auto &odRoom = domainRooms[other.id];
-                    odRoom.erase(remove(odRoom.begin(), odRoom.end(), a.roomID), odRoom.end());
-
-                    // remove the timeslot itself (if you prefer to prevent reuse of same timeslot globally for other courses,
-                    // comment this out if timeslots can be reused by separate instructors/rooms)
-                    auto &odSlot = domainSlots[other.id];
-                    odSlot.erase(remove(odSlot.begin(), odSlot.end(), a.timeSlotID), odSlot.end());
-
-                    // If any domain becomes empty, fail early
-                    if (odInst.empty() || odRoom.empty() || odSlot.empty()) {
-                        ok = false;
-                        break;
-                    }
+CSPSolver::CSPSolver(const vector<Course>& courses_, const vector<Instructor>& instructors_,
+                     const vector<InstructorCourse>& instructorCourses_, const vector<Room>& rooms_,
+                     const vector<TimeSlot>& timeSlots_)
+        : courses(courses_), instructors(instructors_), instructorCourses(instructorCourses_), 
+          rooms(rooms_), timeSlots(timeSlots_) {
+    for (const auto &c : courses) courseIndex[c.id] = &c;
+    for (const auto &ic : instructorCourses) courseToInstructors[ic.courseID].push_back(ic.instructorID);
+    
+    if (courseToInstructors.empty()) {
+        for (const auto &ins : instructors) {
+            string q = ins.qualifiedCourses;
+            size_t pos = 0;
+            while (pos < q.size()) {
+                size_t comma = q.find(',', pos);
+                string token = (comma == string::npos) ? q.substr(pos) : q.substr(pos, comma - pos);
+                auto l = token.find_first_not_of(" \t");
+                auto r = token.find_last_not_of(" \t");
+                if (l != string::npos && r != string::npos) {
+                    courseToInstructors[token.substr(l, r - l + 1)].push_back(ins.id);
                 }
-
-                if (!ok) {
-                    // restore domains and continue
-                    domainInstructors = move(oldDomainInstructors);
-                    domainRooms = move(oldDomainRooms);
-                    domainSlots = move(oldDomainSlots);
-                    continue;
-                }
-
-                // Accept assignment and recurse
-                solution.push_back(a);
-                if (backtrack(depth + 1)) return true;
-
-                // Backtrack: remove assignment and restore domains
-                solution.pop_back();
-                domainInstructors = move(oldDomainInstructors);
-                domainRooms = move(oldDomainRooms);
-                domainSlots = move(oldDomainSlots);
+                if (comma == string::npos) break;
+                pos = comma + 1;
             }
         }
     }
+}
 
+void CSPSolver::buildLectureVariables() {
+    variables.clear();
+    const vector<string> year1 = {"LRA401", "CSC111", "MTH111", "PHY113", "ECE111", "LRA101", "LRA104", "LRA105"};
+    const vector<string> year2 = {"MTH212", "ACM215", "LRA403", "CSC211", "CNC111", "CSC114", "CSE214", "LRA306"};
+    const vector<string> japaneseLanguages = {"LRA401", "LRA403"};
+    
+    auto isInList = [](const vector<string>& list, const string& id) {
+        return find(list.begin(), list.end(), id) != list.end();
+    };
+
+    for (const auto &c : courses) {
+        int courseYear = 0;
+        if (isInList(year1, c.id)) courseYear = 1;
+        else if (isInList(year2, c.id)) courseYear = 2;
+        else continue;
+
+        bool isJapanese = isInList(japaneseLanguages, c.id);
+        
+        if (isJapanese) {
+            for (int grp = 1; grp <= 3; grp++) {
+                for (int section = 1; section <= 3; ++section) {
+                    LectureVar v;
+                    v.courseID = c.id;
+                    v.year = courseYear;
+                    v.groupId = grp;
+                    v.lengthMin = 90;
+                    v.sessionType = "LECTURE";
+                    v.sectionId = section;
+                    v.varID = c.id + "_Y" + to_string(courseYear) + "_G" + to_string(grp) + "_S" + to_string(section);
+                    variables.push_back(move(v));
+                }
+            }
+        } else {
+            for (int grp = 1; grp <= 3; grp++) {
+                LectureVar vLec;
+                vLec.courseID = c.id;
+                vLec.year = courseYear;
+                vLec.groupId = grp;
+                vLec.lengthMin = 90;
+                vLec.sessionType = "LECTURE";
+                vLec.sectionId = 0;
+                vLec.varID = c.id + "_Y" + to_string(courseYear) + "_G" + to_string(grp) + "_LEC";
+                variables.push_back(move(vLec));
+            }
+        }
+    }
+}
+
+void CSPSolver::buildDomains() {
+    domains.clear();
+    domains.resize(variables.size());
+    
+    unordered_map<string, const Room*> roomIndex;
+    for (const auto &r : rooms) roomIndex[r.id] = &r;
+    
+    unordered_map<string, const Instructor*> instructorIndex;
+    for (const auto &ins : instructors) instructorIndex[ins.id] = &ins;
+    
+    for (size_t vi = 0; vi < variables.size(); ++vi) {
+        const auto &v = variables[vi];
+        const Course* course = nullptr;
+        auto it = courseIndex.find(v.courseID);
+        if (it != courseIndex.end()) course = it->second;
+        if (!course) continue;
+
+        vector<string> qualifiedInstructors;
+        
+        if (v.sessionType == "LECTURE") {
+            auto insIt = courseToInstructors.find(course->id);
+            vector<string> qualified;
+            if (insIt != courseToInstructors.end()) qualified = insIt->second;
+            
+            for (const auto &insID : qualified) {
+                auto insPtr = instructorIndex.find(insID);
+                if (insPtr != instructorIndex.end() && insPtr->second->role == "Professor") {
+                    qualifiedInstructors.push_back(insID);
+                }
+            }
+            
+            if (qualifiedInstructors.empty()) {
+                for (const auto &ins : instructors) {
+                    if (ins.role == "Professor") qualifiedInstructors.push_back(ins.id);
+                }
+            }
+            
+            for (size_t tsIdx = 0; tsIdx < timeSlots.size(); ++tsIdx) {
+                const TimeSlot &ts = timeSlots[tsIdx];
+                if ((ts.endMin - ts.startMin) < v.lengthMin) continue;
+                
+                for (const auto &r : rooms) {
+                    if (r.roomType != "Classroom" && r.roomType != "Theater" && r.roomType != "Hall") continue;
+                    for (const auto &insID : qualifiedInstructors) {
+                        AssignmentValue av;
+                        av.timeslotIndex = (int)tsIdx;
+                        av.roomID = r.id;
+                        av.instructorID = insID;
+                        domains[vi].push_back(av);
+                    }
+                }
+            }
+        } else if (v.sessionType == "LAB") {
+            auto insIt = courseToInstructors.find(course->id);
+            vector<string> qualified;
+            if (insIt != courseToInstructors.end()) qualified = insIt->second;
+            
+            for (const auto &insID : qualified) {
+                auto insPtr = instructorIndex.find(insID);
+                if (insPtr != instructorIndex.end() && insPtr->second->role == "Assistant Professor") {
+                    qualifiedInstructors.push_back(insID);
+                }
+            }
+            
+            if (qualifiedInstructors.empty()) {
+                for (const auto &ins : instructors) {
+                    if (ins.role == "Assistant Professor") qualifiedInstructors.push_back(ins.id);
+                }
+            }
+            
+            for (size_t tsIdx = 0; tsIdx < timeSlots.size(); ++tsIdx) {
+                const TimeSlot &ts = timeSlots[tsIdx];
+                if ((ts.endMin - ts.startMin) < v.lengthMin) continue;
+                
+                for (const auto &r : rooms) {
+                    bool roomOk = false;
+                    if (v.courseID == "ECE111") roomOk = (r.id == "B07-F0");
+                    else if (v.courseID == "PHY113") roomOk = (r.id == "COE-F21" || r.id == "COE-F22" || r.id == "COE-F11");
+                    else roomOk = (r.roomType == "Lab");
+                    
+                    if (!roomOk) continue;
+                    
+                    for (const auto &insID : qualifiedInstructors) {
+                        AssignmentValue av;
+                        av.timeslotIndex = (int)tsIdx;
+                        av.roomID = r.id;
+                        av.instructorID = insID;
+                        domains[vi].push_back(av);
+                    }
+                }
+            }
+        }
+    }
+    
+    int totalDomain = 0;
+    for (const auto &d : domains) totalDomain += d.size();
+}
+
+bool CSPSolver::isHardConflict(const AssignmentValue& a, const AssignmentValue& b,
+                                const LectureVar& va, const LectureVar& vb) const {
+    const TimeSlot& tsA = timeSlots[a.timeslotIndex];
+    const TimeSlot& tsB = timeSlots[b.timeslotIndex];
+    
+    if (tsA.day != tsB.day) return false;
+    
+    bool timeOverlap = !(tsA.endMin <= tsB.startMin || tsB.endMin <= tsA.startMin);
+    if (!timeOverlap) return false;
+    
+    if (a.instructorID == b.instructorID) return true;
+    if (a.roomID == b.roomID) return true;
+    
+    if (va.groupId > 0 && vb.groupId > 0) {
+        if (va.year == vb.year && va.groupId == vb.groupId) return true;
+    }
+    
+    if (va.courseID == vb.courseID && va.sessionType == "LECTURE" && vb.sessionType == "LECTURE" &&
+        a.instructorID != b.instructorID) {
+        return true;
+    }
+    
     return false;
 }
 
-bool CSPSolver::solve() {
-    cout << "Starting CSP Backtracking Solver with Forward Checking + MRV...\n";
-    // ensure solution empty before starting
-    solution.clear();
-    bool ok = backtrack(0);
-    if (ok) cout << "Solution found!\n";
-    else cout << "No valid timetable.\n";
-    return ok;
+int CSPSolver::computeSoftCost(const unordered_map<string, AssignmentValue>& assignments) const {
+    int cost = 0;
+    if (timeSlots.empty()) return cost;
+    
+    int earliestStartMin = numeric_limits<int>::max();
+    for (const auto &ts : timeSlots) earliestStartMin = min(earliestStartMin, ts.startMin);
+    
+    for (auto &p : assignments) {
+        const TimeSlot &ts = timeSlots[p.second.timeslotIndex];
+        if (ts.startMin == earliestStartMin) cost += 5;
+    }
+    
+    unordered_map<string, unordered_map<string, int>> courseDayCount;
+    for (auto &p : assignments) {
+        size_t pos = p.first.find("_Y");
+        string courseID = (pos != string::npos) ? p.first.substr(0, pos) : p.first;
+        const TimeSlot &ts = timeSlots[p.second.timeslotIndex];
+        courseDayCount[courseID][ts.day] += 1;
+    }
+    
+    for (auto &cd : courseDayCount) {
+        for (auto &d : cd.second) {
+            if (d.second > 1) cost += (d.second - 1) * 2;
+        }
+    }
+    
+    return cost;
 }
 
-void CSPSolver::printSolution() {
-    cout << "\n===== GENERATED TIMETABLE =====\n";
-    if (solution.empty()) {
-        cout << "No assignments found.\n";
+CSPResult CSPSolver::backtrackSearch() {
+    cout << "Starting backtrack search (MRV + Forward Checking)\n";
+    cout << "   -> This may take a little bit ..." << endl;
+    auto start = clk::now();
+    CSPResult result;
+    result.success = false;
+    result.hardViolations = 0;
+    result.softCost = 0;
+    
+    for (size_t i = 0; i < variables.size(); ++i) {
+        if (domains[i].empty()) {
+            cout << "Variable " << variables[i].varID << " has empty domain\n";
+            result.hardViolations = 1;
+            result.solveSeconds = 0.0;
+            return result;
+        }
+    }
+    
+    vector<vector<AssignmentValue>> doms = domains;
+    unordered_map<string, AssignmentValue> assignments;
+    unordered_map<string, string> courseProfessor;
+    
+    function<bool()> dfs = [&]() -> bool {
+        if (assignments.size() == variables.size()) {
+            result.success = true;
+            result.assignments = assignments;
+            result.hardViolations = 0;
+            result.softCost = computeSoftCost(assignments);
+            return true;
+        }
+        
+        int chosen = -1;
+        size_t bestSize = numeric_limits<size_t>::max();
+        for (size_t i = 0; i < variables.size(); ++i) {
+            if (assignments.find(variables[i].varID) != assignments.end()) continue;
+            if (doms[i].size() < bestSize) {
+                bestSize = doms[i].size();
+                chosen = (int)i;
+            }
+        }
+        if (chosen == -1) return false;
+        
+        auto domainCopy = doms[chosen];
+        for (const auto &val : domainCopy) {
+            const LectureVar& chosenVar = variables[chosen];
+            
+            if (chosenVar.sessionType == "LECTURE") {
+                auto profIt = courseProfessor.find(chosenVar.courseID);
+                if (profIt != courseProfessor.end() && profIt->second != val.instructorID) continue;
+            }
+            
+            bool conflict = false;
+            for (const auto &as : assignments) {
+                auto itVar = find_if(variables.begin(), variables.end(),
+                                     [&](const LectureVar& lv) { return lv.varID == as.first; });
+                if (itVar == variables.end()) continue;
+                int otherIndex = (int)distance(variables.begin(), itVar);
+                if (isHardConflict(val, as.second, variables[chosen], variables[otherIndex])) {
+                    conflict = true;
+                    break;
+                }
+            }
+            if (conflict) continue;
+            
+            assignments[variables[chosen].varID] = val;
+            if (chosenVar.sessionType == "LECTURE") courseProfessor[chosenVar.courseID] = val.instructorID;
+            
+            vector<pair<int, vector<AssignmentValue>>> changed;
+            for (size_t j = 0; j < doms.size(); ++j) {
+                if (assignments.find(variables[j].varID) != assignments.end()) continue;
+                
+                vector<AssignmentValue> newdom;
+                for (auto &cand : doms[j]) {
+                    bool filterOut = false;
+                    
+                    if (isHardConflict(val, cand, variables[chosen], variables[j])) {
+                        filterOut = true;
+                    }
+                    
+                    if (!filterOut && variables[j].sessionType == "LECTURE") {
+                        auto profIt = courseProfessor.find(variables[j].courseID);
+                        if (profIt != courseProfessor.end() && profIt->second != cand.instructorID) {
+                            filterOut = true;
+                        }
+                    }
+                    
+                    if (!filterOut) newdom.push_back(cand);
+                }
+                
+                if (newdom.size() < doms[j].size()) {
+                    changed.emplace_back((int)j, doms[j]);
+                    doms[j] = move(newdom);
+                }
+            }
+            
+            bool anyEmpty = false;
+            for (size_t j = 0; j < doms.size(); ++j) {
+                if (assignments.find(variables[j].varID) == assignments.end() && doms[j].empty()) {
+                    anyEmpty = true;
+                    break;
+                }
+            }
+            
+            if (!anyEmpty && dfs()) return true;
+            
+            for (auto &p : changed) doms[p.first] = move(p.second);
+            assignments.erase(variables[chosen].varID);
+            
+            if (chosenVar.sessionType == "LECTURE") {
+                bool otherGroupAssigned = false;
+                for (const auto &as : assignments) {
+                    auto itVar = find_if(variables.begin(), variables.end(),
+                                         [&](const LectureVar& lv) { return lv.varID == as.first; });
+                    if (itVar != variables.end() && itVar->courseID == chosenVar.courseID && 
+                        itVar->sessionType == "LECTURE") {
+                        otherGroupAssigned = true;
+                        break;
+                    }
+                }
+                if (!otherGroupAssigned) courseProfessor.erase(chosenVar.courseID);
+            }
+        }
+        
+        return false;
+    };
+    
+    bool found = dfs();
+    auto end = clk::now();
+    result.solveSeconds = chrono::duration<double>(end - start).count();
+    
+    if (!found) {
+        result.success = false;
+        cout << "No solution found after " << result.solveSeconds << " seconds\n";
+    }
+    
+    return result;
+}
+
+CSPResult CSPSolver::solve(int maxSolutions) {
+    return backtrackSearch();
+}
+
+void CSPSolver::printResult(const CSPResult& r, const vector<LectureVar>& vars,
+                            const vector<TimeSlot>& timeSlots, const vector<Room>& rooms) {
+    if (!r.success) {
+        cout << "\nNo solution found. Hard violations: " << r.hardViolations 
+             << ", time: " << r.solveSeconds << "s\n";
         return;
     }
-    for (const auto &a : solution) {
-        cout << "Course " << a.courseID
-             << " | Instructor " << a.instructorID
-             << " | Room " << a.roomID
-             << " | TimeSlot " << a.timeSlotID << "\n";
+    
+    unordered_map<string, const Room*> roomIndex;
+    for (const auto &rm : rooms) roomIndex[rm.id] = &rm;
+    
+    unordered_map<string, string> instructorNames;
+    for (const auto &ins : instructors) instructorNames[ins.id] = ins.name;
+    
+    unordered_map<string, string> courseNames;
+    for (const auto &c : courses) courseNames[c.id] = c.name;
+    
+    cout << "\nSolution found in " << r.solveSeconds << "\n";
+    cout << "=========================================\n";
+
+    for (const auto &v : vars) {
+        auto it = r.assignments.find(v.varID);
+        if (it == r.assignments.end()) continue;
+        
+        const AssignmentValue &a = it->second;
+        const TimeSlot &ts = timeSlots[a.timeslotIndex];
+        const Room* rm = nullptr;
+        auto rit = roomIndex.find(a.roomID);
+        if (rit != roomIndex.end()) rm = rit->second;
+        
+        string cname = courseNames.count(v.courseID) ? courseNames[v.courseID] : v.courseID;
+        string insName = instructorNames.count(a.instructorID) ? instructorNames[a.instructorID] : a.instructorID;
+        
+        cout << v.courseID << " | " << cname << " (Y" << v.year << ")";
+        
+        if (v.sessionType == "LECTURE") {
+            if (v.sectionId > 0) {
+                cout << " | G" << v.groupId << " Section " << v.sectionId;
+            } else {
+                cout << " | G" << v.groupId << " Lecture";
+            }
+        } else if (v.sessionType == "LAB") {
+            cout << " | Lab S" << v.sectionId;
+        }
+        
+        cout << "\n  " << ts.day << " " << minTo12Hour(ts.startMin) << " - " << minTo12Hour(ts.endMin)
+             << " | " << (rm ? rm->roomName : a.roomID) << " (" << (rm ? rm->building : "") << ")"
+             << " | " << insName << "\n\n";
     }
+    
+    cout << "=========================================\n";
 }

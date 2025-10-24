@@ -1,6 +1,7 @@
 #pragma once
 #include <vector>
 #include <string>
+#include <map>
 #include "models.h"
 #include "../sqlite//sqlite3.h"
 using namespace std;
@@ -18,4 +19,7 @@ public:
     vector<InstructorCourse> getInstructorCourses();
     vector<Room> getRooms();
     vector<TimeSlot> getTimeSlots();
+    
+    // Helper to get instructors qualified for a specific course
+    vector<Instructor> getInstructorsForCourse(const string& courseID);
 };

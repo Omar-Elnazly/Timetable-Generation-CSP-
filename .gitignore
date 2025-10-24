@@ -1,0 +1,40 @@
+# Build directories
+build/
+cmake-build-*/
+.cmake/
+
+# Compiled binaries
+*.exe
+*.out
+*.o
+*.obj
+*.so
+*.dylib
+*.dll
+
+# Database files (optional - uncomment if you want to exclude)
+# *.db
+# *.db-journal
+
+# IDE files
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# CMake
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+Makefile
+*.cmake
+
+# Output files
+*.txt
+!CMakeLists.txt
+!README.md
+
+# OS files
+.DS_Store
+Thumbs.db

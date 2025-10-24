@@ -7,10 +7,12 @@ struct Course {
     string id;
     string name;
     int credits;
+    string type;
+    int year;
+    string specialization;
     bool hasLecture;
     bool hasLab;
-    bool hasLongTut;
-    bool hasShortTut;
+    bool isGradProject;
 };
 
 struct Instructor {
@@ -37,18 +39,23 @@ struct Room {
 struct TimeSlot {
     int id;
     string day;
-    string slotType;
     string startTxt;
     string endTxt;
     int startMin;
     int endMin;
 };
 
-
-// ZINA
-struct LectureAssignment {
+struct ClassSession {
     string courseID;
+    string courseName;
+    int year;
+    int group;          // 1, 2, or 3
+    int section;        // 1, 2, or 3 (for Japanese language only)
+    string sessionType; // "Lecture" or "Lab"
     string instructorID;
+    string instructorName;
     string roomID;
     int timeSlotID;
+    string day;
+    string timeRange;
 };
