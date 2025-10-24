@@ -20,10 +20,10 @@ int main() {
 
         vector<Course> filteredCourses;
         for (const auto& c : courses) {
-            if (c.year == 1 || c.year == 2) filteredCourses.push_back(c);
+            if (c.year == 1 || c.year == 2 || c.year == 3) filteredCourses.push_back(c);
         }
         
-        cout << "Scheduling " << filteredCourses.size() << " courses (Year 1 and 2)\n";
+        cout << "Scheduling " << filteredCourses.size() << " courses (Years 1-3)\n";
 
         CSPSolver solver(filteredCourses, instructors, instructorCourses, rooms, timeSlots);
         solver.buildLectureVariables();

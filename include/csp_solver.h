@@ -13,9 +13,10 @@
 struct LectureVar {
     string varID;           // unique identifier
     string courseID;        // e.g., "CSC111"
-    int year;               // 1 or 2
-    int groupId;            // 1-3 for lectures, 0 for sections (labs)
+    int year;               // 1, 2, or 3
+    int groupId;            // 1-3 for Y1/Y2, 0 for Y3 specializations
     int sectionId;          // for Japanese: 1-3, for labs: 1-3, else 0
+    string specialization;  // "AID", "BIF", "CSC", "CNC" for Year 3, empty otherwise
     string sessionType;     // "LECTURE", "LAB"
     int lengthMin;          // 90 minutes
 };

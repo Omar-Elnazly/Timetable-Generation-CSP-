@@ -53,21 +53,59 @@ void CSPSolver::buildLectureVariables() {
     variables.clear();
     const vector<string> year1 = {"LRA401", "CSC111", "MTH111", "PHY113", "ECE111", "LRA101", "LRA104", "LRA105"};
     const vector<string> year2 = {"MTH212", "ACM215", "LRA403", "CSC211", "CNC111", "CSC114", "CSE214", "LRA306"};
+    const vector<string> year3 = {"AID311", "AID312", "BIF311", "CNC311", "CNC312", "CNC314", "CSC317", "ECE324"};
     const vector<string> japaneseLanguages = {"LRA401", "LRA403"};
+    const vector<string> specializations = {"AID", "BIF", "CSC", "CNC"};
     
     auto isInList = [](const vector<string>& list, const string& id) {
         return find(list.begin(), list.end(), id) != list.end();
+    };
+    
+    auto getSpecialization = [](const string& courseID) -> string {
+        if (courseID.substr(0, 3) == "AID") return "AID";
+        if (courseID.substr(0, 3) == "BIF") return "BIF";
+        if (courseID.substr(0, 3) == "CSC") return "CSC";
+        if (courseID.substr(0, 3) == "CNC") return "CNC";
+        return "";
     };
 
     for (const auto &c : courses) {
         int courseYear = 0;
         if (isInList(year1, c.id)) courseYear = 1;
         else if (isInList(year2, c.id)) courseYear = 2;
+        else if (isInList(year3, c.id)) courseYear = 3;
         else continue;
 
         bool isJapanese = isInList(japaneseLanguages, c.id);
         
-        if (isJapanese) {
+        if (courseYear == 3) {
+            string spec = getSpecialization(c.id);
+            if (spec.empty()) {
+                for (const auto& s : specializations) {
+                    LectureVar vLec;
+                    vLec.courseID = c.id;
+                    vLec.year = courseYear;
+                    vLec.groupId = 0;
+                    vLec.specialization = s;
+                    vLec.lengthMin = 90;
+                    vLec.sessionType = "LECTURE";
+                    vLec.sectionId = 0;
+                    vLec.varID = c.id + "_Y3_" + s + "_LEC";
+                    variables.push_back(move(vLec));
+                }
+            } else {
+                LectureVar vLec;
+                vLec.courseID = c.id;
+                vLec.year = courseYear;
+                vLec.groupId = 0;
+                vLec.specialization = spec;
+                vLec.lengthMin = 90;
+                vLec.sessionType = "LECTURE";
+                vLec.sectionId = 0;
+                vLec.varID = c.id + "_Y3_" + spec + "_LEC";
+                variables.push_back(move(vLec));
+            }
+        } else if (isJapanese) {
             for (int grp = 1; grp <= 3; grp++) {
                 for (int section = 1; section <= 3; ++section) {
                     LectureVar v;
@@ -210,6 +248,10 @@ bool CSPSolver::isHardConflict(const AssignmentValue& a, const AssignmentValue& 
     
     if (va.groupId > 0 && vb.groupId > 0) {
         if (va.year == vb.year && va.groupId == vb.groupId) return true;
+    }
+    
+    if (!va.specialization.empty() && !vb.specialization.empty()) {
+        if (va.year == vb.year && va.specialization == vb.specialization) return true;
     }
     
     if (va.courseID == vb.courseID && va.sessionType == "LECTURE" && vb.sessionType == "LECTURE" &&
@@ -427,7 +469,9 @@ void CSPSolver::printResult(const CSPResult& r, const vector<LectureVar>& vars,
         cout << v.courseID << " | " << cname << " (Y" << v.year << ")";
         
         if (v.sessionType == "LECTURE") {
-            if (v.sectionId > 0) {
+            if (v.year == 3 && !v.specialization.empty()) {
+                cout << " | " << v.specialization << " Lecture";
+            } else if (v.sectionId > 0) {
                 cout << " | G" << v.groupId << " Section " << v.sectionId;
             } else {
                 cout << " | G" << v.groupId << " Lecture";
