@@ -7,7 +7,6 @@
 #include <chrono>
 #include <string>
 
-// CSP variable: a session that needs scheduling
 struct LectureVar {
     string varID;
     string courseID;
@@ -20,7 +19,6 @@ struct LectureVar {
     bool isFullDay;         // true for graduation projects (4 consecutive slots)
 };
 
-// CSP value: (timeslot, room, instructor) assignment
 struct AssignmentValue {
     int timeslotIndex;
     string roomID;
@@ -48,7 +46,6 @@ public:
     CSPResult solve(int maxSolutions = 1);
     void printResult(const CSPResult& r, const std::vector<LectureVar>& vars,
                      const std::vector<TimeSlot>& timeSlots, const std::vector<Room>& rooms);
-    // Greedy scheduler to assign lab variables given fixed lecture assignments
     CSPResult scheduleLabsGreedy(const std::vector<LectureVar>& lectureVars,
                                  const std::unordered_map<std::string, AssignmentValue>& lectureAssignments);
 

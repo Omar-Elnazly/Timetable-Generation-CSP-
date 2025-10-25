@@ -1,16 +1,15 @@
 file(REMOVE_RECURSE
-  "CMakeFiles/TestSql.dir/sqlite/sqlite3.c.obj"
-  "CMakeFiles/TestSql.dir/sqlite/sqlite3.c.obj.d"
-  "CMakeFiles/TestSql.dir/src/csp_solver.cpp.obj"
-  "CMakeFiles/TestSql.dir/src/csp_solver.cpp.obj.d"
-  "CMakeFiles/TestSql.dir/src/database_manager.cpp.obj"
-  "CMakeFiles/TestSql.dir/src/database_manager.cpp.obj.d"
-  "CMakeFiles/TestSql.dir/src/main.cpp.obj"
-  "CMakeFiles/TestSql.dir/src/main.cpp.obj.d"
-  "TestSql.exe"
-  "TestSql.exe.manifest"
+  "CMakeFiles/TestSql.dir/link.d"
+  "CMakeFiles/TestSql.dir/sqlite/sqlite3.c.o"
+  "CMakeFiles/TestSql.dir/sqlite/sqlite3.c.o.d"
+  "CMakeFiles/TestSql.dir/src/csp_solver.cpp.o"
+  "CMakeFiles/TestSql.dir/src/csp_solver.cpp.o.d"
+  "CMakeFiles/TestSql.dir/src/database_manager.cpp.o"
+  "CMakeFiles/TestSql.dir/src/database_manager.cpp.o.d"
+  "CMakeFiles/TestSql.dir/src/main.cpp.o"
+  "CMakeFiles/TestSql.dir/src/main.cpp.o.d"
+  "TestSql"
   "TestSql.pdb"
-  "libTestSql.dll.a"
 )
 
 # Per-language clean rules from dependency scanning.

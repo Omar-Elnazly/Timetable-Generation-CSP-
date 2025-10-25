@@ -20,6 +20,5 @@ public:
     vector<Room> getRooms();
     vector<TimeSlot> getTimeSlots();
     
-    // Helper to get instructors qualified for a specific course
     vector<Instructor> getInstructorsForCourse(const string& courseID);
 };

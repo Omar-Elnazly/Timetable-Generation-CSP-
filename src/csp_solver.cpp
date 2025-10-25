@@ -11,7 +11,6 @@
 using namespace std;
 using clk = chrono::high_resolution_clock;
 
-// Convert minutes since midnight to 12-hour format (e.g., 540 -> "09:00AM")
 static string minTo12Hour(int mins) {
     int h = mins / 60, m = mins % 60;
     bool pm = (h >= 12);
@@ -27,15 +26,12 @@ CSPSolver::CSPSolver(const vector<Course>& courses_, const vector<Instructor>& i
         : courses(courses_), instructors(instructors_), instructorCourses(instructorCourses_),
           rooms(rooms_), timeSlots(timeSlots_) {
 
-    // Build course index for fast lookup
     for (const auto &c : courses) courseIndex[c.id] = &c;
 
-    // Build instructor-to-course mapping
     for (const auto &ic : instructorCourses) {
         courseToInstructors[ic.courseID].push_back(ic.instructorID);
     }
 
-    // Fallback: parse QualifiedCourses if mapping is empty
     if (courseToInstructors.empty()) {
         for (const auto &ins : instructors) {
             string q = ins.qualifiedCourses;
@@ -55,9 +51,6 @@ CSPSolver::CSPSolver(const vector<Course>& courses_, const vector<Instructor>& i
     }
 }
 
-// -------------------------
-// buildLectureVariables()
-// -------------------------
 void CSPSolver::buildLectureVariables() {
     variables.clear();
 
@@ -71,13 +64,10 @@ void CSPSolver::buildLectureVariables() {
         return find(list.begin(), list.end(), id) != list.end();
     };
 
-    // First pass: create LECTURE variables
     for (const auto &c : courses) {
         int yr = c.year;
         if (yr < 1 || yr > 4) continue;
 
-        // *** Remove grad-projects from lecture generation.
-        // Grad projects will be created as LAB variables (handled below).
         if (c.isGradProject) continue;
 
         if (yr == 1 && !isInList(year1, c.id)) continue;
@@ -109,7 +99,7 @@ void CSPSolver::buildLectureVariables() {
                 v.groupId = 0;
                 v.specialization = c.specialization;
                 v.lengthMin = 90;
-                v.sessionType = "LECTURE"; // always lecture for normal (no grad projects here)
+                v.sessionType = "LECTURE";
                 v.sectionId = 0;
                 v.isFullDay = false;
                 v.varID = c.id + "_Y" + to_string(yr) + "_" + c.specialization + "_LEC";
@@ -148,38 +138,33 @@ void CSPSolver::buildLectureVariables() {
         }
     }
 
-    // Second pass: append LAB variables for Years 1-4 where course.hasLab == true
-    // ALSO include grad projects (isGradProject) even if hasLab == false.
     for (const auto &c : courses) {
         int yr = c.year;
         if (yr < 1 || yr > 4) continue;
 
-        // include course if it hasLab OR it's a grad project
         if (!c.hasLab && !c.isGradProject) continue;
 
         if (yr == 1 || yr == 2) {
-            // For Y1-2: labs per group and per section
             for (int grp = 1; grp <= 3; grp++) {
                 for (int sec = 1; sec <= 3; sec++) {
                     LectureVar v;
                     v.courseID = c.id;
                     v.year = yr;
-                    v.groupId = grp;        // group the section belongs to
-                    v.sectionId = sec;      // specific section
+                    v.groupId = grp;
+                    v.sectionId = sec;
                     v.sessionType = "LAB";
-                    v.lengthMin = 90;       // keep 90 or adjust if lab length differs
-                    v.isFullDay = c.isGradProject; // grad projects become full-day if flagged
-                    v.specialization = "";  // not relevant here
+                    v.lengthMin = 90;
+                    v.isFullDay = c.isGradProject;
+                    v.specialization = "";
                     v.varID = c.id + "_Y" + to_string(yr) + "_G" + to_string(grp) + "_S" + to_string(sec) + "_LAB";
                     variables.push_back(v);
                 }
             }
-        } else { // yr == 3 || yr == 4
-            // For Y3-4: create lab variables per specialization (mirror lectures), include sectionId so prints as "SPEC S1 Lab"
+        } else {
             bool isCommon = (c.specialization == "Common" || c.specialization.empty());
             if (isCommon) {
                 for (const auto& s : specializations) {
-                    int sec = 1; // default to S1 for these labs (change if you want multiple sections)
+                    int sec = 1;
                     LectureVar v;
                     v.courseID = c.id;
                     v.year = yr;
@@ -188,7 +173,7 @@ void CSPSolver::buildLectureVariables() {
                     v.specialization = s;
                     v.sessionType = "LAB";
                     v.lengthMin = 90;
-                    v.isFullDay = c.isGradProject; // if course is grad project, make it full-day
+                    v.isFullDay = c.isGradProject;
                     v.varID = c.id + "_Y" + to_string(yr) + "_" + s + "_S" + to_string(sec) + "_LAB";
                     variables.push_back(v);
                 }
@@ -210,11 +195,6 @@ void CSPSolver::buildLectureVariables() {
     }
 }
 
-
-
-// -------------------------
-// buildDomains()
-// -------------------------
 void CSPSolver::buildDomains() {
     domains.clear();
     domains.resize(variables.size());
@@ -233,7 +213,6 @@ void CSPSolver::buildDomains() {
         vector<string> qualifiedInstructors;
 
         if (v.sessionType == "LECTURE") {
-            // same as before: prefer Professors mapped in instructorCourses
             if (courseToInstructors.count(course->id)) {
                 for (const auto &insID : courseToInstructors[course->id]) {
                     if (instructorIndex.count(insID) && instructorIndex[insID]->role == "Professor") {
@@ -247,7 +226,6 @@ void CSPSolver::buildDomains() {
                 }
             }
 
-            // Generate domain: all valid (timeslot, room, instructor) combinations for lecture rooms
             for (size_t tsIdx = 0; tsIdx < timeSlots.size(); tsIdx++) {
                 const TimeSlot &ts = timeSlots[tsIdx];
                 if ((ts.endMin - ts.startMin) < v.lengthMin) continue;
@@ -261,11 +239,6 @@ void CSPSolver::buildDomains() {
             }
         }
         else if (v.sessionType == "LAB") {
-            // For labs (Y1-4):
-            // - Prefer Assistant Professors only.
-            // - If course-to-instructor mapping exists, take assistants from that list.
-            // - Otherwise take all Assistant Professors.
-            // - Fallback to any instructor if no assistant professors are available (prevents empty domains).
             if (courseToInstructors.count(course->id)) {
                 for (const auto &insID : courseToInstructors[course->id]) {
                     if (instructorIndex.count(insID) && instructorIndex[insID]->role == "Assistant Professor") {
@@ -280,7 +253,6 @@ void CSPSolver::buildDomains() {
                 }
             }
 
-            // fallback to any instructor (edge case) to avoid empty domain
             if (qualifiedInstructors.empty()) {
                 for (const auto &ins : instructors) qualifiedInstructors.push_back(ins.id);
             }
@@ -290,9 +262,7 @@ void CSPSolver::buildDomains() {
                 if ((ts.endMin - ts.startMin) < v.lengthMin) continue;
 
                 for (const auto &r : rooms) {
-                    // Accept Lab OR Classroom for lab sessions
                     if (r.roomType != "Lab" && r.roomType != "Classroom") continue;
-                    // Add each assistant professor candidate
                     for (const auto &insID : qualifiedInstructors) {
                         domains[vi].push_back({(int)tsIdx, r.id, insID});
                     }
@@ -314,32 +284,24 @@ bool CSPSolver::isHardConflict(const AssignmentValue& a, const AssignmentValue& 
 
     if (tsA.day != tsB.day) return false;
 
-    // Full-day projects conflict with anything on the same day
     bool timeOverlap = (va.isFullDay || vb.isFullDay) ? true :
                        !(tsA.endMin <= tsB.startMin || tsB.endMin <= tsA.startMin);
     if (!timeOverlap) return false;
 
-    // Same instructor (only if both assignments have non-empty instructor IDs)
     if (!a.instructorID.empty() && !b.instructorID.empty() && a.instructorID == b.instructorID) return true;
 
-    // Same room
     if (a.roomID == b.roomID) return true;
 
-    // Same year and group (Years 1-2) normally conflicts for lectures — but allow different sections' LABs
     if (va.groupId > 0 && vb.groupId > 0 && va.year == vb.year && va.groupId == vb.groupId) {
-        // If both are LABs and they are different sections, allow them to overlap (they are separate section groups).
         if (va.sessionType == "LAB" && vb.sessionType == "LAB" && va.sectionId != vb.sectionId) {
-            // allowed (no conflict) as long as room and instructor checks above are satisfied
         } else {
             return true;
         }
     }
 
-    // Same year and specialization (Years 3-4) - keep existing behavior
     if (!va.specialization.empty() && !vb.specialization.empty() &&
         va.year == vb.year && va.specialization == vb.specialization) return true;
 
-    // Same course lectures must have same instructor (only applies for lectures)
     if (va.courseID == vb.courseID && va.sessionType == "LECTURE" &&
         vb.sessionType == "LECTURE" && !a.instructorID.empty() && !b.instructorID.empty() &&
         a.instructorID != b.instructorID) return true;
@@ -399,10 +361,9 @@ CSPResult CSPSolver::backtrackSearch() {
 
     vector<vector<AssignmentValue>> doms = domains;
     unordered_map<string, AssignmentValue> assignments;
-    unordered_map<string, string> courseProfessor; // Ensures same course lectures have same professor
+    unordered_map<string, string> courseProfessor;
 
     function<bool()> dfs = [&]() -> bool {
-        // Base case: all variables assigned
         if (assignments.size() == variables.size()) {
             result.success = true;
             result.assignments = assignments;
@@ -411,7 +372,6 @@ CSPResult CSPSolver::backtrackSearch() {
             return true;
         }
 
-        // MRV: choose variable with smallest domain
         int chosen = -1;
         size_t minDomainSize = numeric_limits<size_t>::max();
         for (size_t i = 0; i < variables.size(); i++) {
@@ -427,12 +387,10 @@ CSPResult CSPSolver::backtrackSearch() {
         for (const auto &val : domainCopy) {
             const LectureVar& chosenVar = variables[chosen];
 
-            // Consistency check: same course lectures must have same professor
             if (chosenVar.sessionType == "LECTURE" && courseProfessor.count(chosenVar.courseID)) {
                 if (courseProfessor[chosenVar.courseID] != val.instructorID) continue;
             }
 
-            // Check conflicts with existing assignments
             bool conflict = false;
             for (const auto &as : assignments) {
                 auto itVar = find_if(variables.begin(), variables.end(),
@@ -446,11 +404,9 @@ CSPResult CSPSolver::backtrackSearch() {
             }
             if (conflict) continue;
 
-            // Make assignment
             assignments[chosenVar.varID] = val;
             if (chosenVar.sessionType == "LECTURE") courseProfessor[chosenVar.courseID] = val.instructorID;
 
-            // Forward checking: prune domains
             vector<pair<int, vector<AssignmentValue>>> changed;
             for (size_t j = 0; j < doms.size(); j++) {
                 if (assignments.count(variables[j].varID)) continue;
@@ -474,7 +430,6 @@ CSPResult CSPSolver::backtrackSearch() {
                 }
             }
 
-            // Check if any domain became empty (dead end)
             bool anyEmpty = false;
             for (size_t j = 0; j < doms.size(); j++) {
                 if (!assignments.count(variables[j].varID) && doms[j].empty()) {
@@ -485,7 +440,6 @@ CSPResult CSPSolver::backtrackSearch() {
 
             if (!anyEmpty && dfs()) return true;
 
-            // Backtrack: undo assignment and restore domains
             for (auto &p : changed) doms[p.first] = move(p.second);
             assignments.erase(chosenVar.varID);
 
@@ -537,8 +491,6 @@ void CSPSolver::printResult(const CSPResult& r, const vector<LectureVar>& vars,
     unordered_map<string, string> instructorNames, courseNames;
     for (const auto &ins : instructors) instructorNames[ins.id] = ins.name;
     for (const auto &c : courses) courseNames[c.id] = c.name;
-
-    cout << "\nSolution found in " << r.solveSeconds << "s\n=========================================\n";
 
     for (const auto &v : vars) {
         auto it = r.assignments.find(v.varID);
@@ -594,5 +546,5 @@ void CSPSolver::printResult(const CSPResult& r, const vector<LectureVar>& vars,
              << " | " << insName << "\n\n";
     }
 
-    cout << "=========================================\n";
+    cout << "Solution found in " << r.solveSeconds << "s\n=========================================\n";
 }
