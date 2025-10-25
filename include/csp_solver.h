@@ -48,6 +48,9 @@ public:
     CSPResult solve(int maxSolutions = 1);
     void printResult(const CSPResult& r, const std::vector<LectureVar>& vars,
                      const std::vector<TimeSlot>& timeSlots, const std::vector<Room>& rooms);
+    // Greedy scheduler to assign lab variables given fixed lecture assignments
+    CSPResult scheduleLabsGreedy(const std::vector<LectureVar>& lectureVars,
+                                 const std::unordered_map<std::string, AssignmentValue>& lectureAssignments);
 
     const std::vector<LectureVar>& getVariables() const { return variables; }
 
@@ -65,7 +68,7 @@ private:
     std::unordered_map<std::string, std::vector<std::string>> courseToInstructors;
 
     CSPResult backtrackSearch();
-    bool isHardConflict(const AssignmentValue& a, const AssignmentValue& b, 
+    bool isHardConflict(const AssignmentValue& a, const AssignmentValue& b,
                         const LectureVar& va, const LectureVar& vb) const;
     int computeSoftCost(const std::unordered_map<std::string, AssignmentValue>& assignments) const;
 };

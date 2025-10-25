@@ -21,16 +21,16 @@ int main() {
         for (const auto& c : courses) {
             if (c.year >= 1 && c.year <= 4) filteredCourses.push_back(c);
         }
-        
+
         cout << "Scheduling " << filteredCourses.size() << " courses (Years 1-4)\n";
 
         CSPSolver solver(filteredCourses, instructors, instructorCourses, rooms, timeSlots);
         solver.buildLectureVariables();
         solver.buildDomains();
-        
+
         cout << "\n";
         CSPResult result = solver.solve();
-        
+
         if (result.success) {
             solver.printResult(result, solver.getVariables(), timeSlots, rooms);
             cout << "\nSUCCESS | Hard violations: " << result.hardViolations << "\n";

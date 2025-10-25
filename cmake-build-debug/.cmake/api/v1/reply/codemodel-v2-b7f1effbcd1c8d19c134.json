@@ -6,7 +6,7 @@
 			[
 				{
 					"build" : ".",
-					"jsonFile" : "directory-.-Debug-f5ebdc15457944623624.json",
+					"jsonFile" : "directory-.-Debug-d0094a50bb2071803777.json",
 					"minimumCMakeVersion" : 
 					{
 						"string" : "3.28"
@@ -39,7 +39,7 @@
 				{
 					"directoryIndex" : 0,
 					"id" : "TestSql::@6890427a1f51a3e7e1df",
-					"jsonFile" : "target-TestSql-Debug-c18a33db41e96395dc78.json",
+					"jsonFile" : "target-TestSql-Debug-4d23d3afa94f24c3dd26.json",
 					"name" : "TestSql",
 					"projectIndex" : 0
 				}
@@ -49,12 +49,12 @@
 	"kind" : "codemodel",
 	"paths" : 
 	{
-		"build" : "/home/huevvn/Downloads/Timetable-Generation-CSP-/cmake-build-debug",
-		"source" : "/home/huevvn/Downloads/Timetable-Generation-CSP-"
+		"build" : "F:/Timetable-Generation-CSP-/cmake-build-debug",
+		"source" : "F:/Timetable-Generation-CSP-"
 	},
 	"version" : 
 	{
 		"major" : 2,
-		"minor" : 8
+		"minor" : 6
 	}
 }
