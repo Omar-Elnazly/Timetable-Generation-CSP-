@@ -76,6 +76,10 @@ void CSPSolver::buildLectureVariables() {
         int yr = c.year;
         if (yr < 1 || yr > 4) continue;
 
+        // *** Remove grad-projects from lecture generation.
+        // Grad projects will be created as LAB variables (handled below).
+        if (c.isGradProject) continue;
+
         if (yr == 1 && !isInList(year1, c.id)) continue;
         if (yr == 2 && !isInList(year2, c.id)) continue;
         if (yr == 3 && !isInList(year3, c.id)) continue;
@@ -105,10 +109,10 @@ void CSPSolver::buildLectureVariables() {
                 v.groupId = 0;
                 v.specialization = c.specialization;
                 v.lengthMin = 90;
-                v.sessionType = c.isGradProject ? "LAB" : "LECTURE";
+                v.sessionType = "LECTURE"; // always lecture for normal (no grad projects here)
                 v.sectionId = 0;
-                v.isFullDay = c.isGradProject;
-                v.varID = c.id + "_Y" + to_string(yr) + "_" + c.specialization + (c.isGradProject ? "_GRADPROJ" : "_LEC");
+                v.isFullDay = false;
+                v.varID = c.id + "_Y" + to_string(yr) + "_" + c.specialization + "_LEC";
                 variables.push_back(v);
             }
         }
@@ -145,14 +149,16 @@ void CSPSolver::buildLectureVariables() {
     }
 
     // Second pass: append LAB variables for Years 1-4 where course.hasLab == true
+    // ALSO include grad projects (isGradProject) even if hasLab == false.
     for (const auto &c : courses) {
         int yr = c.year;
         if (yr < 1 || yr > 4) continue;
 
-        if (!c.hasLab) continue; // only add labs for courses that have labs
+        // include course if it hasLab OR it's a grad project
+        if (!c.hasLab && !c.isGradProject) continue;
 
         if (yr == 1 || yr == 2) {
-            // For Y1-2: keep existing behavior — labs per group and per section
+            // For Y1-2: labs per group and per section
             for (int grp = 1; grp <= 3; grp++) {
                 for (int sec = 1; sec <= 3; sec++) {
                     LectureVar v;
@@ -162,7 +168,7 @@ void CSPSolver::buildLectureVariables() {
                     v.sectionId = sec;      // specific section
                     v.sessionType = "LAB";
                     v.lengthMin = 90;       // keep 90 or adjust if lab length differs
-                    v.isFullDay = false;
+                    v.isFullDay = c.isGradProject; // grad projects become full-day if flagged
                     v.specialization = "";  // not relevant here
                     v.varID = c.id + "_Y" + to_string(yr) + "_G" + to_string(grp) + "_S" + to_string(sec) + "_LAB";
                     variables.push_back(v);
@@ -182,7 +188,7 @@ void CSPSolver::buildLectureVariables() {
                     v.specialization = s;
                     v.sessionType = "LAB";
                     v.lengthMin = 90;
-                    v.isFullDay = false;
+                    v.isFullDay = c.isGradProject; // if course is grad project, make it full-day
                     v.varID = c.id + "_Y" + to_string(yr) + "_" + s + "_S" + to_string(sec) + "_LAB";
                     variables.push_back(v);
                 }
@@ -255,9 +261,30 @@ void CSPSolver::buildDomains() {
             }
         }
         else if (v.sessionType == "LAB") {
-            // For labs (now Y1-4):
-            // - We don't require/fetch a specific instructor (use empty instructorID).
-            // - Allow Lab-type rooms OR Classroom rooms (flexible).
+            // For labs (Y1-4):
+            // - Prefer Assistant Professors only.
+            // - If course-to-instructor mapping exists, take assistants from that list.
+            // - Otherwise take all Assistant Professors.
+            // - Fallback to any instructor if no assistant professors are available (prevents empty domains).
+            if (courseToInstructors.count(course->id)) {
+                for (const auto &insID : courseToInstructors[course->id]) {
+                    if (instructorIndex.count(insID) && instructorIndex[insID]->role == "Assistant Professor") {
+                        qualifiedInstructors.push_back(insID);
+                    }
+                }
+            }
+
+            if (qualifiedInstructors.empty()) {
+                for (const auto &ins : instructors) {
+                    if (ins.role == "Assistant Professor") qualifiedInstructors.push_back(ins.id);
+                }
+            }
+
+            // fallback to any instructor (edge case) to avoid empty domain
+            if (qualifiedInstructors.empty()) {
+                for (const auto &ins : instructors) qualifiedInstructors.push_back(ins.id);
+            }
+
             for (size_t tsIdx = 0; tsIdx < timeSlots.size(); tsIdx++) {
                 const TimeSlot &ts = timeSlots[tsIdx];
                 if ((ts.endMin - ts.startMin) < v.lengthMin) continue;
@@ -265,8 +292,10 @@ void CSPSolver::buildDomains() {
                 for (const auto &r : rooms) {
                     // Accept Lab OR Classroom for lab sessions
                     if (r.roomType != "Lab" && r.roomType != "Classroom") continue;
-                    // Optional: check capacity >= section student count if you have that data
-                    domains[vi].push_back({(int)tsIdx, r.id, string("")}); // instructorID = "" (none)
+                    // Add each assistant professor candidate
+                    for (const auto &insID : qualifiedInstructors) {
+                        domains[vi].push_back({(int)tsIdx, r.id, insID});
+                    }
                 }
             }
         }
@@ -520,7 +549,7 @@ void CSPSolver::printResult(const CSPResult& r, const vector<LectureVar>& vars,
         const Room* rm = roomIndex.count(a.roomID) ? roomIndex[a.roomID] : nullptr;
 
         string cname = courseNames.count(v.courseID) ? courseNames[v.courseID] : v.courseID;
-        // show a friendly dash for empty instructorIDs
+        // show a friendly dash for empty instructorIDs (shouldn't be empty for labs after change)
         string insName = a.instructorID.empty()
                          ? "null"
                          : (instructorNames.count(a.instructorID) ? instructorNames[a.instructorID] : a.instructorID);
