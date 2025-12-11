@@ -193,6 +193,8 @@ void CSPSolver::buildLectureVariables() {
             }
         }
     }
+    
+    cout << "Total variables created: " << variables.size() << endl;
 }
 
 void CSPSolver::buildDomains() {

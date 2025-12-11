@@ -1,1 +1,1 @@
-/usr/bin/c++ -O3 -DNDEBUG -Wl,--dependency-file=CMakeFiles/TestSql.dir/link.d CMakeFiles/TestSql.dir/sqlite/sqlite3.c.o CMakeFiles/TestSql.dir/src/main.cpp.o CMakeFiles/TestSql.dir/src/database_manager.cpp.o CMakeFiles/TestSql.dir/src/csp_solver.cpp.o -o TestSql
+/usr/bin/c++  -arch arm64 -Wl,-search_paths_first -Wl,-headerpad_max_install_names CMakeFiles/TestSql.dir/sqlite/sqlite3.c.o CMakeFiles/TestSql.dir/src/main.cpp.o CMakeFiles/TestSql.dir/src/database_manager.cpp.o CMakeFiles/TestSql.dir/src/csp_solver.cpp.o -o TestSql

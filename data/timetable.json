@@ -4,7 +4,7 @@
     "totalCourses": 52,
     "totalSessions": 221,
     "violations": 0,
-    "solveTime": 5.767
+    "solveTime": 9.71791
   },
   "schedule": {
     "1": {
@@ -1447,7 +1447,7 @@
       {
         "code": "ECE324",
         "name": "Digital Signal Processing",
-        "type": "AID S1 Lab",
+        "type": "AID Lab",
         "day": "Sunday",
         "time": "09:00AM - 10:30AM",
         "startTime": "09:00AM",
@@ -1458,7 +1458,7 @@
       {
         "code": "CSC317",
         "name": "Computer Graphics and Visualization",
-        "type": "AID S1 Lab",
+        "type": "AID Lab",
         "day": "Tuesday",
         "time": "02:15PM - 03:45PM",
         "startTime": "02:15PM",
@@ -1469,7 +1469,7 @@
       {
         "code": "AID312",
         "name": "Intelligent Systems",
-        "type": "AID S1 Lab",
+        "type": "AID Lab",
         "day": "Monday",
         "time": "02:15PM - 03:45PM",
         "startTime": "02:15PM",
@@ -1480,7 +1480,7 @@
       {
         "code": "CNC311",
         "name": "Computer Networks",
-        "type": "AID S1 Lab",
+        "type": "AID Lab",
         "day": "Tuesday",
         "time": "09:00AM - 10:30AM",
         "startTime": "09:00AM",
@@ -1491,7 +1491,7 @@
       {
         "code": "CNC314",
         "name": "Database Systems",
-        "type": "AID S1 Lab",
+        "type": "AID Lab",
         "day": "Tuesday",
         "time": "12:30PM - 02:00PM",
         "startTime": "12:30PM",
@@ -1502,7 +1502,7 @@
       {
         "code": "AID311",
         "name": "Mathematics of Data Science",
-        "type": "AID S1 Lab",
+        "type": "AID Lab",
         "day": "Monday",
         "time": "12:30PM - 02:00PM",
         "startTime": "12:30PM",
@@ -1581,7 +1581,7 @@
       {
         "code": "ECE324",
         "name": "Digital Signal Processing",
-        "type": "BIF S1 Lab",
+        "type": "BIF Lab",
         "day": "Sunday",
         "time": "12:30PM - 02:00PM",
         "startTime": "12:30PM",
@@ -1592,7 +1592,7 @@
       {
         "code": "CSC317",
         "name": "Computer Graphics and Visualization",
-        "type": "BIF S1 Lab",
+        "type": "BIF Lab",
         "day": "Tuesday",
         "time": "10:45AM - 12:15PM",
         "startTime": "10:45AM",
@@ -1603,7 +1603,7 @@
       {
         "code": "AID312",
         "name": "Intelligent Systems",
-        "type": "BIF S1 Lab",
+        "type": "BIF Lab",
         "day": "Tuesday",
         "time": "09:00AM - 10:30AM",
         "startTime": "09:00AM",
@@ -1614,7 +1614,7 @@
       {
         "code": "CNC311",
         "name": "Computer Networks",
-        "type": "BIF S1 Lab",
+        "type": "BIF Lab",
         "day": "Monday",
         "time": "02:15PM - 03:45PM",
         "startTime": "02:15PM",
@@ -1625,7 +1625,7 @@
       {
         "code": "CNC314",
         "name": "Database Systems",
-        "type": "BIF S1 Lab",
+        "type": "BIF Lab",
         "day": "Tuesday",
         "time": "02:15PM - 03:45PM",
         "startTime": "02:15PM",
@@ -1636,7 +1636,7 @@
       {
         "code": "BIF311",
         "name": "Human Biology",
-        "type": "BIF S1 Lab",
+        "type": "BIF Lab",
         "day": "Sunday",
         "time": "02:15PM - 03:45PM",
         "startTime": "02:15PM",
@@ -1715,7 +1715,7 @@
       {
         "code": "ECE324",
         "name": "Digital Signal Processing",
-        "type": "CNC S1 Lab",
+        "type": "CNC Lab",
         "day": "Sunday",
         "time": "10:45AM - 12:15PM",
         "startTime": "10:45AM",
@@ -1726,7 +1726,7 @@
       {
         "code": "CSC317",
         "name": "Computer Graphics and Visualization",
-        "type": "CNC S1 Lab",
+        "type": "CNC Lab",
         "day": "Tuesday",
         "time": "12:30PM - 02:00PM",
         "startTime": "12:30PM",
@@ -1737,7 +1737,7 @@
       {
         "code": "AID312",
         "name": "Intelligent Systems",
-        "type": "CNC S1 Lab",
+        "type": "CNC Lab",
         "day": "Monday",
         "time": "02:15PM - 03:45PM",
         "startTime": "02:15PM",
@@ -1748,7 +1748,7 @@
       {
         "code": "CNC311",
         "name": "Computer Networks",
-        "type": "CNC S1 Lab",
+        "type": "CNC Lab",
         "day": "Monday",
         "time": "12:30PM - 02:00PM",
         "startTime": "12:30PM",
@@ -1759,7 +1759,7 @@
       {
         "code": "CNC314",
         "name": "Database Systems",
-        "type": "CNC S1 Lab",
+        "type": "CNC Lab",
         "day": "Tuesday",
         "time": "09:00AM - 10:30AM",
         "startTime": "09:00AM",
@@ -1770,7 +1770,7 @@
       {
         "code": "CNC312",
         "name": "Foundations of Information Systems",
-        "type": "CNC S1 Lab",
+        "type": "CNC Lab",
         "day": "Tuesday",
         "time": "10:45AM - 12:15PM",
         "startTime": "10:45AM",
@@ -1849,7 +1849,7 @@
       {
         "code": "ECE324",
         "name": "Digital Signal Processing",
-        "type": "CSC S1 Lab",
+        "type": "CSC Lab",
         "day": "Sunday",
         "time": "02:15PM - 03:45PM",
         "startTime": "02:15PM",
@@ -1860,7 +1860,7 @@
       {
         "code": "CSC317",
         "name": "Computer Graphics and Visualization",
-        "type": "CSC S1 Lab",
+        "type": "CSC Lab",
         "day": "Tuesday",
         "time": "12:30PM - 02:00PM",
         "startTime": "12:30PM",
@@ -1871,7 +1871,7 @@
       {
         "code": "AID312",
         "name": "Intelligent Systems",
-        "type": "CSC S1 Lab",
+        "type": "CSC Lab",
         "day": "Monday",
         "time": "10:45AM - 12:15PM",
         "startTime": "10:45AM",
@@ -1882,7 +1882,7 @@
       {
         "code": "CNC311",
         "name": "Computer Networks",
-        "type": "CSC S1 Lab",
+        "type": "CSC Lab",
         "day": "Monday",
         "time": "02:15PM - 03:45PM",
         "startTime": "02:15PM",
@@ -1893,7 +1893,7 @@
       {
         "code": "CNC314",
         "name": "Database Systems",
-        "type": "CSC S1 Lab",
+        "type": "CSC Lab",
         "day": "Tuesday",
         "time": "10:45AM - 12:15PM",
         "startTime": "10:45AM",
@@ -1904,7 +1904,7 @@
       {
         "code": "CSC314",
         "name": "Software Modeling and Analysis",
-        "type": "CSC S1 Lab",
+        "type": "CSC Lab",
         "day": "Tuesday",
         "time": "02:15PM - 03:45PM",
         "startTime": "02:15PM",
@@ -1985,7 +1985,7 @@
       {
         "code": "AID321",
         "name": "Machine Learning",
-        "type": "AID S1 Lab",
+        "type": "AID Lab",
         "day": "Tuesday",
         "time": "10:45AM - 12:15PM",
         "startTime": "10:45AM",
@@ -1996,7 +1996,7 @@
       {
         "code": "AID428",
         "name": "New Trends in AI",
-        "type": "AID S1 Lab",
+        "type": "AID Lab",
         "day": "Sunday",
         "time": "12:30PM - 02:00PM",
         "startTime": "12:30PM",
@@ -2007,7 +2007,7 @@
       {
         "code": "AID411",
         "name": "BIG Data Analytics & Visualization",
-        "type": "AID S1 Lab",
+        "type": "AID Lab",
         "day": "Sunday",
         "time": "02:15PM - 03:45PM",
         "startTime": "02:15PM",
@@ -2018,7 +2018,7 @@
       {
         "code": "AID417",
         "name": "Advanced Data Mining",
-        "type": "AID S1 Lab",
+        "type": "AID Lab",
         "day": "Monday",
         "time": "09:00AM - 10:30AM",
         "startTime": "09:00AM",
@@ -2029,7 +2029,7 @@
       {
         "code": "AID414",
         "name": "Graduation Project (1)",
-        "type": "AID S1 Lab (Full Day)",
+        "type": "AID Lab (Full Day)",
         "day": "Wednesday",
         "time": "09:00AM - 03:45PM",
         "startTime": "09:00AM",
@@ -2040,7 +2040,7 @@
       {
         "code": "AID413",
         "name": "Data Security",
-        "type": "AID S1 Lab",
+        "type": "AID Lab",
         "day": "Tuesday",
         "time": "12:30PM - 02:00PM",
         "startTime": "12:30PM",
@@ -2051,7 +2051,7 @@
       {
         "code": "AID427",
         "name": "New Trends in Data Science",
-        "type": "AID S1 Lab",
+        "type": "AID Lab",
         "day": "Tuesday",
         "time": "02:15PM - 03:45PM",
         "startTime": "02:15PM",
@@ -2119,7 +2119,7 @@
       {
         "code": "BIF412",
         "name": "Management and Design of Health Care Systems",
-        "type": "BIF S1 Lab",
+        "type": "BIF Lab",
         "day": "Monday",
         "time": "02:15PM - 03:45PM",
         "startTime": "02:15PM",
@@ -2130,7 +2130,7 @@
       {
         "code": "BIF411",
         "name": "Structural Bioinformatics",
-        "type": "BIF S1 Lab",
+        "type": "BIF Lab",
         "day": "Wednesday",
         "time": "09:00AM - 10:30AM",
         "startTime": "09:00AM",
@@ -2141,7 +2141,7 @@
       {
         "code": "BIF413",
         "name": "Algorithms in Bioinformatics",
-        "type": "BIF S1 Lab",
+        "type": "BIF Lab",
         "day": "Sunday",
         "time": "12:30PM - 02:00PM",
         "startTime": "12:30PM",
@@ -2152,7 +2152,7 @@
       {
         "code": "BIF425",
         "name": "New Trends in Bioinformatics",
-        "type": "BIF S1 Lab",
+        "type": "BIF Lab",
         "day": "Sunday",
         "time": "09:00AM - 10:30AM",
         "startTime": "09:00AM",
@@ -2163,7 +2163,7 @@
       {
         "code": "BIF410",
         "name": "Graduation Project (1)",
-        "type": "BIF S1 Lab (Full Day)",
+        "type": "BIF Lab (Full Day)",
         "day": "Tuesday",
         "time": "09:00AM - 03:45PM",
         "startTime": "09:00AM",
@@ -2174,7 +2174,7 @@
       {
         "code": "BIF424",
         "name": "IT Infrastructure",
-        "type": "BIF S1 Lab",
+        "type": "BIF Lab",
         "day": "Wednesday",
         "time": "10:45AM - 12:15PM",
         "startTime": "10:45AM",
@@ -2253,7 +2253,7 @@
       {
         "code": "CNC413",
         "name": "Digital Forensics",
-        "type": "CNC S1 Lab",
+        "type": "CNC Lab",
         "day": "Wednesday",
         "time": "09:00AM - 10:30AM",
         "startTime": "09:00AM",
@@ -2264,7 +2264,7 @@
       {
         "code": "CNC419",
         "name": "IT Security and Risk Management",
-        "type": "CNC S1 Lab",
+        "type": "CNC Lab",
         "day": "Wednesday",
         "time": "10:45AM - 12:15PM",
         "startTime": "10:45AM",
@@ -2275,7 +2275,7 @@
       {
         "code": "CNC418",
         "name": "Software Security",
-        "type": "CNC S1 Lab",
+        "type": "CNC Lab",
         "day": "Wednesday",
         "time": "12:30PM - 02:00PM",
         "startTime": "12:30PM",
@@ -2286,7 +2286,7 @@
       {
         "code": "CNC324",
         "name": "IT Infrastructure",
-        "type": "CNC S1 Lab",
+        "type": "CNC Lab",
         "day": "Monday",
         "time": "12:30PM - 02:00PM",
         "startTime": "12:30PM",
@@ -2297,7 +2297,7 @@
       {
         "code": "CNC411",
         "name": "Fundamentals of Cybersecurity",
-        "type": "CNC S1 Lab",
+        "type": "CNC Lab",
         "day": "Sunday",
         "time": "10:45AM - 12:15PM",
         "startTime": "10:45AM",
@@ -2308,7 +2308,7 @@
       {
         "code": "CNC415",
         "name": "Network Design and Management",
-        "type": "CNC S1 Lab",
+        "type": "CNC Lab",
         "day": "Wednesday",
         "time": "02:15PM - 03:45PM",
         "startTime": "02:15PM",
@@ -2319,7 +2319,7 @@
       {
         "code": "CNC414",
         "name": "Graduation Project (1)",
-        "type": "CNC S1 Lab (Full Day)",
+        "type": "CNC Lab (Full Day)",
         "day": "Tuesday",
         "time": "09:00AM - 03:45PM",
         "startTime": "09:00AM",
@@ -2398,7 +2398,7 @@
       {
         "code": "CSC414",
         "name": "Game Design & Development",
-        "type": "CSC S1 Lab",
+        "type": "CSC Lab",
         "day": "Monday",
         "time": "12:30PM - 02:00PM",
         "startTime": "12:30PM",
@@ -2409,7 +2409,7 @@
       {
         "code": "CSC415",
         "name": "New Trends in Computer Science",
-        "type": "CSC S1 Lab",
+        "type": "CSC Lab",
         "day": "Monday",
         "time": "02:15PM - 03:45PM",
         "startTime": "02:15PM",
@@ -2420,7 +2420,7 @@
       {
         "code": "CSC426",
         "name": "Distributed Systems",
-        "type": "CSC S1 Lab",
+        "type": "CSC Lab",
         "day": "Wednesday",
         "time": "09:00AM - 10:30AM",
         "startTime": "09:00AM",
@@ -2431,7 +2431,7 @@
       {
         "code": "CSC410",
         "name": "Software Quality",
-        "type": "CSC S1 Lab",
+        "type": "CSC Lab",
         "day": "Wednesday",
         "time": "10:45AM - 12:15PM",
         "startTime": "10:45AM",
@@ -2442,7 +2442,7 @@
       {
         "code": "CSC412",
         "name": "Software Security",
-        "type": "CSC S1 Lab",
+        "type": "CSC Lab",
         "day": "Wednesday",
         "time": "12:30PM - 02:00PM",
         "startTime": "12:30PM",
@@ -2453,7 +2453,7 @@
       {
         "code": "CSC413",
         "name": "Graduation Project (1)",
-        "type": "CSC S1 Lab (Full Day)",
+        "type": "CSC Lab (Full Day)",
         "day": "Tuesday",
         "time": "09:00AM - 03:45PM",
         "startTime": "09:00AM",
@@ -2464,7 +2464,7 @@
       {
         "code": "CSC411",
         "name": "Software Verification and Validation (V&V)",
-        "type": "CSC S1 Lab",
+        "type": "CSC Lab",
         "day": "Wednesday",
         "time": "02:15PM - 03:45PM",
         "startTime": "02:15PM",

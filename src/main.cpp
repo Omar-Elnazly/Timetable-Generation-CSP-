@@ -123,7 +123,7 @@ int main() {
                         }
                     } else if (v.sessionType == "LAB") {
                         if (!v.specialization.empty() && v.sectionId > 0) {
-                            sessionType = v.specialization + " S" + to_string(v.sectionId) + " Lab";
+                            sessionType = v.specialization + " Lab";
                         } else if (v.groupId > 0 && v.sectionId > 0) {
                             sessionType = "G" + to_string(v.groupId) + " S" + to_string(v.sectionId) + " Lab";
                         } else {

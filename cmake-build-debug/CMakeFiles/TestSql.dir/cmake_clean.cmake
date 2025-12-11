@@ -1,5 +1,4 @@
 file(REMOVE_RECURSE
-  "CMakeFiles/TestSql.dir/link.d"
   "CMakeFiles/TestSql.dir/sqlite/sqlite3.c.o"
   "CMakeFiles/TestSql.dir/sqlite/sqlite3.c.o.d"
   "CMakeFiles/TestSql.dir/src/csp_solver.cpp.o"
