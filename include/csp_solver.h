@@ -46,8 +46,7 @@ public:
     CSPResult solve(int maxSolutions = 1);
     void printResult(const CSPResult& r, const std::vector<LectureVar>& vars,
                      const std::vector<TimeSlot>& timeSlots, const std::vector<Room>& rooms);
-    CSPResult scheduleLabsGreedy(const std::vector<LectureVar>& lectureVars,
-                                 const std::unordered_map<std::string, AssignmentValue>& lectureAssignments);
+
 
     const std::vector<LectureVar>& getVariables() const { return variables; }
 

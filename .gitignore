@@ -1,0 +1,21 @@
+# Build directories
+build/
+cmake-build-debug/
+dist/
+node_modules/
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# IDE settings
+.vscode/
+.idea/
+
+# Backend Output
+data/timetable.json
+*.db-journal
+
+# Dependencies
+package-lock.json
+pnpm-lock.yaml

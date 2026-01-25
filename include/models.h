@@ -1,6 +1,8 @@
 #pragma once
 #include <string>
 #include <vector>
+#include <sstream>
+#include <iomanip>
 using namespace std;
 
 struct Course {
@@ -45,17 +47,14 @@ struct TimeSlot {
     int endMin;
 };
 
-struct ClassSession {
-    string courseID;
-    string courseName;
-    int year;
-    int group;          // 1, 2, or 3
-    int section;        // 1, 2, or 3 (for Japanese language only)
-    string sessionType; // "Lecture" or "Lab"
-    string instructorID;
-    string instructorName;
-    string roomID;
-    int timeSlotID;
-    string day;
-    string timeRange;
-};
+inline string minTo12Hour(int mins) {
+    int h = mins / 60;
+    int m = mins % 60;
+    bool pm = (h >= 12);
+    if (h > 12) h -= 12;
+    if (h == 0) h = 12;
+    
+    ostringstream ss;
+    ss << (h < 10 ? "0" : "") << h << ":" << (m < 10 ? "0" : "") << m << (pm ? "PM" : "AM");
+    return ss.str();
+}

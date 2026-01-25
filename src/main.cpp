@@ -29,17 +29,7 @@ string escapeJson(const string& s) {
     return o.str();
 }
 
-string minTo12Hour(int min) {
-    int h = min / 60;
-    int m = min % 60;
-    bool pm = h >= 12;
-    if (h > 12) h -= 12;
-    if (h == 0) h = 12;
-    
-    ostringstream oss;
-    oss << (h < 10 ? "0" : "") << h << ":" << (m < 10 ? "0" : "") << m << (pm ? "PM" : "AM");
-    return oss.str();
-}
+
 
 int main() {
     try {

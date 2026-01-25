@@ -18,7 +18,7 @@ app.use(express.json());
 app.post('/api/run-solver', (req, res) => {
     console.log('Running CSP Solver...');
     
-    const cppExecutable = path.join(__dirname, '../cmake-build-debug/TestSql');
+    const cppExecutable = path.join(__dirname, '../build/TestSql');
     const jsonOutputPath = path.join(__dirname, '../data/timetable.json');
     
     if (!fs.existsSync(cppExecutable)) {
@@ -29,7 +29,7 @@ app.post('/api/run-solver', (req, res) => {
     }
 
     const process = spawn(cppExecutable, [], {
-        cwd: path.join(__dirname, '../cmake-build-debug'),
+        cwd: path.join(__dirname, '../build'),
         shell: '/bin/bash'
     });
 
@@ -93,5 +93,5 @@ app.post('/api/run-solver', (req, res) => {
 
 app.listen(PORT, () => {
     console.log(`Backend server running on http://localhost:${PORT}`);
-    console.log('Executable path:', path.join(__dirname, '../cmake-build-debug/TestSql'));
+    console.log('Executable path:', path.join(__dirname, '../build/TestSql'));
 });

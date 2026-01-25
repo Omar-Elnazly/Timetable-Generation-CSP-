@@ -1,24 +1,15 @@
-// csp_solver.cpp
 #include "../include/csp_solver.h"
 #include <algorithm>
 #include <iostream>
 #include <unordered_set>
 #include <limits>
 #include <functional>
-#include <sstream>
-#include <iomanip>
+
 
 using namespace std;
 using clk = chrono::high_resolution_clock;
 
-static string minTo12Hour(int mins) {
-    int h = mins / 60, m = mins % 60;
-    bool pm = (h >= 12);
-    int hh = (h % 12 == 0) ? 12 : h % 12;
-    ostringstream ss;
-    ss << setw(2) << setfill('0') << hh << ":" << setw(2) << m << (pm ? "PM" : "AM");
-    return ss.str();
-}
+
 
 CSPSolver::CSPSolver(const vector<Course>& courses_, const vector<Instructor>& instructors_,
                      const vector<InstructorCourse>& instructorCourses_, const vector<Room>& rooms_,
@@ -442,7 +433,7 @@ CSPResult CSPSolver::backtrackSearch() {
 
             if (!anyEmpty && dfs()) return true;
 
-            for (auto &p : changed) doms[p.first] = move(p.second);
+            for (auto &p : changed) doms[p.first] = std::move(p.second);
             assignments.erase(chosenVar.varID);
 
             if (chosenVar.sessionType == "LECTURE") {
